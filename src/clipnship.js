@@ -1,3 +1,11 @@
+/**
+ * @license
+ * Copyright (c) 2021 Mitchell Adair
+ *
+ * This software is released under the MIT License.
+ * https://opensource.org/licenses/MIT
+ */
+
 class ClipConverter {
     /**
      * The ClipConverter constructor
@@ -68,7 +76,7 @@ class ClipConverter {
     /**
      * Get the canvas element of the clip converter
      *
-     * @param {string} width the width to set the preview canvas to
+     * @param {string} width the width to set the preview canvas to, can be any valid css unit value
      * @returns the canvas of the clip converter
      */
     getPreview(width = "500px") {
