@@ -68,9 +68,11 @@ class ClipConverter {
     /**
      * Get the canvas element of the clip converter
      *
+     * @param {number} width the width in pixels to set the preview to
      * @returns the canvas of the clip converter
      */
-    getCanvas() {
+    getPreview(width) {
+        this._canvas.style = `width: ${width}px`;
         return this._canvas;
     }
 
