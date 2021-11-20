@@ -1,107 +1,200 @@
-const canvas = document.getElementById("render-canvas");
-const video = document.getElementById("src-video");
-const ctx = canvas.getContext("2d");
-let interval;
-let mainScale = 0.8;
+class ClipConverter {
+    /**
+     * The ClipConverter constructor
+     *
+     * @param {blob} video the video to convert
+     */
+    constructor(video) {
+        if (!video) {
+            throw new Error("Must include video data when instantiating a ClipConverter");
+        }
 
-const playVideo = () => document.getElementById("src-video").play();
-const stopVideo = () => document.getElementById("src-video").pause();
-const resetVideo = () => {
-    video.currentTime = 0;
-};
-const toggleCenterLines = () => {
-    const horizontal = document.getElementById("horiz-center");
-    const vertical = document.getElementById("vert-center");
-    horizontal.hidden = !horizontal.hidden;
-    vertical.hidden = !vertical.hidden;
-};
+        this._layers = [];
+        this._canvas = this._createCanvas();
+        this._video = this._createVideo(video);
+        this._playInterval;
+    }
 
-const updateScale = () => {
-    const value = document.getElementById("scale-input").value;
-    document.getElementById("current-scale").textContent = `Scale ${value}%`;
-    mainScale = value / 100;
-    video.paused && draw(ctx, video);
-};
+    _createCanvas() {
+        const canvas = document.createElement("canvas");
+        canvas.setAttribute("id", "clipnship-canvas");
+        canvas.setAttribute("width", "1080");
+        canvas.setAttribute("height", "1920");
+        return canvas;
+    }
 
-const download = (blob) => {
-    const url = URL.createObjectURL(blob);
-    const dl = document.createElement("a");
-    document.body.appendChild(dl);
-    dl.style = "display: none";
-    dl.href = url;
-    dl.download = "clipnship.webm";
-    dl.click();
-    document.body.removeChild(dl);
-    URL.revokeObjectURL(url);
-    video.onended = () => clearInterval(interval);
-};
+    _createVideo(video) {
+        const videoElement = document.createElement("video");
+        videoElement.setAttribute("hidden", "");
+        videoElement.setAttribute("src", video);
 
-const renderClip = () => {
-    const videoStream = canvas.captureStream(60);
-    const audioStream = video.captureStream(60);
-    const combinedStream = new MediaStream([...videoStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
-    const recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm;codecs=vp9" });
-    let outputChunks = [];
+        videoElement.onplay = () => {
+            clearInterval(this._playInterval);
+            this._playInterval = setInterval(() => this._drawLayers(), 1000 / 60);
+        };
+        videoElement.onpause = () => clearInterval(this._playInterval);
+        videoElement.onended = () => clearInterval(this._playInterval);
+        videoElement.onloadedmetadata = () => (videoElement.currentTime = 0);
+        videoElement.onseeked = () => window.requestAnimationFrame(() => this._drawLayers());
 
-    recorder.ondataavailable = (event) => {
-        outputChunks.push(event.data);
-    };
+        document.body.appendChild(videoElement);
+        return videoElement;
+    }
 
-    recorder.onstop = () => {
-        let blob = new Blob(outputChunks, { type: "video/webm;codecs=vp9" });
-        download(blob);
-    };
+    _calculateRenderValues(video, scale = 1) {
+        const vWidth = video.videoWidth;
+        const vHeight = video.videoHeight;
+        const oX = (vHeight - vWidth * scale) / 2;
+        const oY = (vWidth - vHeight * scale) / 2;
+        return {
+            offsetX: oX,
+            offsetY: oY,
+            width: vWidth * scale,
+            height: vHeight * scale,
+        };
+    }
 
-    recorder.start(500);
-    video.play();
-    video.onended = () => {
-        clearInterval(interval);
-        recorder.stop();
-    };
-};
+    _drawLayers() {
+        const ctx = this._canvas.getContext("2d");
+        // doing a regular for loop for performance
+        for (let i = 0; i < this._layers.length; i++) {
+            const layer = this._layers[i];
+            const { offsetX, offsetY, width, height } = this._calculateRenderValues(layer.source, layer.scale);
+            ctx.filter = layer.filter;
+            ctx.drawImage(layer.source, offsetX, offsetY, width, height);
+        }
+    }
 
-const calculateRenderValues = (video, scale = 1) => {
-    const vWidth = video.videoWidth;
-    const vHeight = video.videoHeight;
-    const oX = (vHeight - vWidth * scale) / 2;
-    const oY = (vWidth - vHeight * scale) / 2;
-    return {
-        offsetX: oX,
-        offsetY: oY,
-        videoWidth: vWidth * scale,
-        videoHeight: vHeight * scale,
-    };
-};
+    /**
+     * Get the canvas element of the clip converter
+     *
+     * @returns the canvas of the clip converter
+     */
+    getCanvas() {
+        return this._canvas;
+    }
 
-// makes the main video content smaller and centers it horizontally/vertically
-const drawMain = (ctx, video) => {
-    const { offsetX, offsetY, videoWidth, videoHeight } = calculateRenderValues(video, mainScale);
+    /**
+     * Add a new layer to the clip converter
+     *
+     * @param {string} name the name of the layer
+     * @param {number} scale the scale to set the layer to
+     * @param {string} filter (optional) the filter to apply to the layer, defaults to "none"
+     * @returns the updated list of layers
+     */
+    addLayer(name, scale, filter = "none") {
+        const existing = this.getLayer(name);
+        if (existing) {
+            throw new Error(`Layer with name "${name}" already exists`);
+        } else {
+            this._layers.push({ name, scale, filter, source: this._video });
+            this._drawLayers();
+        }
+        return this._layers;
+    }
 
-    ctx.filter = "none";
-    ctx.drawImage(video, offsetX, offsetY, videoWidth, videoHeight);
-};
+    /**
+     * Remove a layer from the clip converter
+     *
+     * @param {string} name the name of the layer to remove
+     * @returns the updated list of layers
+     */
+    removeLayer(name) {
+        this._layers = this._layers.filter((layer) => layer.name !== name);
+        this._drawLayers();
+        return this._layers;
+    }
 
-// fits the video vertically to the canvas and applies a blur filter to it
-const drawBackground = (ctx, video) => {
-    const scale = video.videoWidth / video.videoHeight;
-    const { offsetX, offsetY, videoWidth, videoHeight } = calculateRenderValues(video, scale);
+    /**
+     * Gets the layer with the given name
+     *
+     * @param {string} name the name of the layer to get
+     * @returns the layer or undefined if not found
+     */
+    getLayer(name) {
+        return this._layers.find((layer) => layer.name === name);
+    }
 
-    ctx.filter = "blur(20px)";
-    ctx.drawImage(video, offsetX, offsetY, videoWidth, videoHeight);
-};
+    /**
+     * Get the current list of layers on the clip converter
+     *
+     * @returns the current list of layers
+     */
+    getLayers() {
+        return this._layers;
+    }
 
-const draw = (ctx, video) => {
-    drawBackground(ctx, video);
-    drawMain(ctx, video);
-};
+    /**
+     * Updates a layer with a new scale value
+     *
+     * @param {string} name the name of the layer to change
+     * @param {number} scale the scale to set the layer to
+     * @returns the updated list of layers
+     */
+    updateLayerScale(name, scale) {
+        const layer = this.getLayer(name);
+        if (layer) {
+            layer.scale = scale;
+            this._drawLayers();
+        } else {
+            throw new Error(`Layer with name "${name}" not found`);
+        }
+        return this._layers;
+    }
 
-video.onpause = () => clearInterval(interval);
-video.onended = () => clearInterval(interval);
-video.onplay = () => {
-    clearInterval(interval);
-    interval = setInterval(() => {
-        draw(ctx, video);
-    }, 1000 / 60);
-};
-video.onloadedmetadata = () => (video.currentTime = 0);
-video.onseeked = () => window.requestAnimationFrame(() => draw(ctx, video));
+    /**
+     * Updates a layer with a new filter value
+     *
+     * @param {string} name the name of the layer to change
+     * @param {string} filter the filter to set the layer to
+     * @returns the updated list of layers
+     */
+    updateLayerFilter(name, filter) {
+        const layer = this.getLayer(name);
+        if (layer) {
+            layer.filter = filter;
+            this._drawLayers();
+        } else {
+            throw new Error(`Layer with name "${name}" not found`);
+        }
+        return this._layers;
+    }
+
+    previewPlay() {
+        this._video.play();
+    }
+
+    previewPause() {
+        this._video.pause();
+    }
+
+    previewReset() {
+        this._video.currentTime = 0;
+    }
+}
+
+// const renderClip = () => {
+//     const videoStream = canvas.captureStream(60);
+//     //const audioStream = video.captureStream(60);
+//     const combinedStream = new MediaStream([...videoStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
+//     const recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm;codecs=vp9" });
+//     let outputChunks = [];
+
+//     recorder.ondataavailable = (event) => {
+//         outputChunks.push(event.data);
+//     };
+
+//     recorder.onstop = () => {
+//         let blob = new Blob(outputChunks, { type: "video/webm;codecs=vp9" });
+//         download(blob);
+//     };
+
+//     recorder.start(500);
+//     /*video.play();
+//     video.onended = () => {
+//         clearInterval(interval);
+//         recorder.stop();
+//     };*/
+// };
+
+window.ClipConverter = ClipConverter;
