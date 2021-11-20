@@ -1,0 +1,1 @@
+uglifyjs --compress --mangle --output ./dist/clipnship.min.js --source-map "filename='./dist/clipnship.js.map'" ./src/clipnship.js
