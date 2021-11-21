@@ -53,7 +53,6 @@ class ClipConverter {
         videoElement.onloadedmetadata = () => (videoElement.currentTime = 0);
         videoElement.onseeked = () => window.requestAnimationFrame(() => this._drawLayers());
 
-        document.body.appendChild(videoElement);
         return videoElement;
     }
 
