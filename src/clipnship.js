@@ -10,7 +10,15 @@ class ClipConverter {
     /**
      * The ClipConverter constructor
      *
-     * @param {blob} video the video to convert
+     * @typicalname converter
+     * @param {URL} video the video to convert
+     * @example
+     * ```js
+     * const video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4"});
+     * const videoURL = URL.createObjectURL(video);
+     *
+     * const converter = new ClipConverter(videoURL);
+     * ```
      */
     constructor(video) {
         if (!video) {
@@ -76,8 +84,14 @@ class ClipConverter {
     /**
      * Get the canvas element of the clip converter
      *
-     * @param {string} width the width to set the preview canvas to, can be any valid css unit value
+     * @param {string} width (optional) the width to set the preview canvas to, can be any valid css unit value
      * @returns the canvas of the clip converter
+     * @example
+     * ```js
+     * // get the preview and add it to a container on your page
+     * const preview = converter.getPreview();
+     * document.getElementById("preview-container").prepend(preview);
+     * ```
      */
     getPreview(width = "500px") {
         this._canvas.style = `width: ${width}`;
@@ -91,6 +105,10 @@ class ClipConverter {
      * @param {number} scale the scale to set the layer to
      * @param {string} filter (optional) the filter to apply to the layer, defaults to "none"
      * @returns the updated list of layers
+     * @example
+     * ```js
+     * converter.addLayer("my-layer", 0.8, "blur(20px)");
+     * ```
      */
     addLayer(name, scale, filter = "none") {
         const existing = this.getLayer(name);
@@ -104,10 +122,35 @@ class ClipConverter {
     }
 
     /**
+     * Gets the layer with the given name
+     *
+     * @param {string} name the name of the layer to get
+     * @returns the layer object or undefined if not found
+     * @example
+     * ```js
+     * const layer = converter.getLayer("my-layer");
+     * // if using example above, should return:
+     * // {
+     * //    name: "my-layer",
+     * //    scale: 0.8,
+     * //    filter: "blur(20px)",
+     * //    video: <video src="someblobdata" hidden/>
+     * // }
+     * ```
+     */
+    getLayer(name) {
+        return this._layers.find((layer) => layer.name === name);
+    }
+
+    /**
      * Remove a layer from the clip converter
      *
      * @param {string} name the name of the layer to remove
      * @returns the updated list of layers
+     * @example
+     * ```js
+     * converter.removeLayer("my-layer");
+     * ```
      */
     removeLayer(name) {
         this._layers = this._layers.filter((layer) => layer.name !== name);
@@ -116,19 +159,13 @@ class ClipConverter {
     }
 
     /**
-     * Gets the layer with the given name
-     *
-     * @param {string} name the name of the layer to get
-     * @returns the layer or undefined if not found
-     */
-    getLayer(name) {
-        return this._layers.find((layer) => layer.name === name);
-    }
-
-    /**
      * Get the current list of layers on the clip converter
      *
      * @returns the current list of layers
+     * @example
+     * ```js
+     * const layers = converter.getLayers();
+     * ```
      */
     getLayers() {
         return this._layers;
@@ -140,6 +177,10 @@ class ClipConverter {
      * @param {string} name the name of the layer to change
      * @param {number} scale the scale to set the layer to
      * @returns the updated list of layers
+     * @example
+     * ```js
+     * converter.updateLayerScale("my-layer", 1.2);
+     * ```
      */
     updateLayerScale(name, scale) {
         const layer = this.getLayer(name);
@@ -158,6 +199,10 @@ class ClipConverter {
      * @param {string} name the name of the layer to change
      * @param {string} filter the filter to set the layer to
      * @returns the updated list of layers
+     * @example
+     * ```js
+     * converter.updateLayerFilter("my-layer", "none");
+     * ```
      */
     updateLayerFilter(name, filter) {
         const layer = this.getLayer(name);
@@ -172,6 +217,10 @@ class ClipConverter {
 
     /**
      * Plays the video on the preview canvas
+     * @example
+     * ```js
+     * converter.previewPlay();
+     * ```
      */
     previewPlay() {
         this._video.play();
@@ -179,6 +228,10 @@ class ClipConverter {
 
     /**
      * Pauses the video on the preview canvas
+     * @example
+     * ```js
+     * converter.previewPause();
+     * ```
      */
     previewPause() {
         this._video.pause();
@@ -186,16 +239,67 @@ class ClipConverter {
 
     /**
      * Resets the video on the preview canvas to the beginning
+     * @example
+     * ```js
+     * converter.previewReset();
+     * ```
      */
     previewReset() {
         this._video.currentTime = 0;
     }
 
     /**
+     * The callback function for when the renderer completes rendering a clip
+     *
+     * @callback ClipConverter~onFinishCallback
+     * @param {blob} data the data blob for the video, this is of type "video/webm;codecs=vp9"
+     * @example
+     * ```js
+     * const onFinish = (data) => {
+     *     // we'll assume a "download" function like the one here: https://stackoverflow.com/a/54626214
+     *     const url = URL.createObjectURL(data);
+     *     const downloadBtn = document.getElementById("download-btn");
+     *     downloadBtn.onclick = () => download(url, "my_clip.webm");
+     * }
+     * ```
+     */
+
+    /**
+     * The callback function for when the renderer updates with progress made
+     *
+     * @callback ClipConverter~onProgressCallback
+     * @param {number} percent the percentage (between 0 and 1) complete the renderer currently is
+     * @example
+     * ```js
+     * const onProgress = (percent) => {
+     *     console.log(`Render is ${Math.round(percent * 100)}% done rendering`);
+     * }
+     * ```
+     */
+
+    /**
+     * Render your clip with the given FPS value
      *
      * @param {number} fps the frames per second to render the clip at
-     * @param {function} onFinishCallback a function taking a blob as an argument to call when done rendering
-     * @param {function} onProgressCallback (optional) a function taking a number between 0 and 1, the percent complete, as an argument to call when progressing through the render
+     * @param {ClipConverter~onFinishCallback} onFinishCallback a function taking a blob as an argument to call when done rendering
+     * @param {ClipConverter~onProgressCallback} onProgressCallback (optional) a function taking a number between 0 and 1, the percent complete, as an argument to call when progressing through the render
+     * @example
+     * ```js
+     * // the function we'll call when rendering is complete
+     * const onFinish = (data) => {
+     *     // we'll assume a "download" function like the one here: https://stackoverflow.com/a/54626214
+     *     const url = URL.createObjectURL(data);
+     *     const downloadBtn = document.getElementById("download-btn");
+     *     downloadBtn.onclick = () => download(url, "my_clip.webm");
+     * }
+     *
+     * // the function we'll call when we get a progress update from the renderer
+     * const onProgress = (percent) => {
+     *     console.log(`Render is ${Math.round(percent * 100)}% done rendering`);
+     * }
+     *
+     * converter.render(60, onFinish, onProgress);
+     * ```
      */
     render(fps, onFinishCallback, onProgressCallback = () => {}) {
         const videoStream = this._canvas.captureStream(fps);
@@ -203,7 +307,6 @@ class ClipConverter {
         const combinedStreams = new MediaStream([...videoStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
         const recorder = new MediaRecorder(combinedStreams, { mimeType: "video/webm;codecs=vp9" });
         let outputChunks = [];
-        let blob;
 
         recorder.ondataavailable = (event) => {
             outputChunks.push(event.data);
