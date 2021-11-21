@@ -14,7 +14,7 @@ class ClipConverter {
      * @param {URL} video the video to convert
      * @example
      * ```js
-     * const video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4"});
+     * const video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4" });
      * const videoURL = URL.createObjectURL(video);
      *
      * const converter = new ClipConverter(videoURL);
