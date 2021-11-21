@@ -170,41 +170,60 @@ class ClipConverter {
         return this._layers;
     }
 
+    /**
+     * Plays the video on the preview canvas
+     */
     previewPlay() {
         this._video.play();
     }
 
+    /**
+     * Pauses the video on the preview canvas
+     */
     previewPause() {
         this._video.pause();
     }
 
+    /**
+     * Resets the video on the preview canvas to the beginning
+     */
     previewReset() {
         this._video.currentTime = 0;
     }
+
+    /**
+     *
+     * @param {number} fps the frames per second to render the clip at
+     * @param {function} onFinishCallback a function taking a blob as an argument to call when done rendering
+     * @param {function} onProgressCallback (optional) a function taking a number between 0 and 1, the percent complete, as an argument to call when progressing through the render
+     */
+    render(fps, onFinishCallback, onProgressCallback = () => {}) {
+        const videoStream = this._canvas.captureStream(fps);
+        const audioStream = this._video.captureStream(fps);
+        const combinedStreams = new MediaStream([...videoStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
+        const recorder = new MediaRecorder(combinedStreams, { mimeType: "video/webm;codecs=vp9" });
+        let outputChunks = [];
+        let blob;
+
+        recorder.ondataavailable = (event) => {
+            outputChunks.push(event.data);
+            onProgressCallback(this._video.currentTime / this._video.duration);
+        };
+
+        recorder.onstop = () => {
+            this._video.volume = 1;
+            onFinishCallback(new Blob(outputChunks, { type: "video/webm;codecs=vp9" }));
+        };
+
+        recorder.start(500);
+        this._video.volume = 0.001; // mute for render
+        this._video.currentTime = 0; // make sure the video is at its start
+        this._video.play();
+        this._video.onended = () => {
+            clearInterval(this._playInterval);
+            recorder.stop();
+        };
+    }
 }
-
-// const renderClip = () => {
-//     const videoStream = canvas.captureStream(60);
-//     //const audioStream = video.captureStream(60);
-//     const combinedStream = new MediaStream([...videoStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
-//     const recorder = new MediaRecorder(combinedStream, { mimeType: "video/webm;codecs=vp9" });
-//     let outputChunks = [];
-
-//     recorder.ondataavailable = (event) => {
-//         outputChunks.push(event.data);
-//     };
-
-//     recorder.onstop = () => {
-//         let blob = new Blob(outputChunks, { type: "video/webm;codecs=vp9" });
-//         download(blob);
-//     };
-
-//     recorder.start(500);
-//     /*video.play();
-//     video.onended = () => {
-//         clearInterval(interval);
-//         recorder.stop();
-//     };*/
-// };
 
 window.ClipConverter = ClipConverter;
