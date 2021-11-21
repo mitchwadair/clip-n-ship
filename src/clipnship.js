@@ -103,7 +103,7 @@ class ClipConverter {
      *
      * @param {string} name the name of the layer
      * @param {number} scale the scale to set the layer to
-     * @param {string} filter (optional) the filter to apply to the layer, defaults to "none"
+     * @param {string} filter (optional) the filter to apply to the layer. Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
      * @returns the updated list of layers
      * @example
      * ```js
@@ -197,7 +197,7 @@ class ClipConverter {
      * Updates a layer with a new filter value
      *
      * @param {string} name the name of the layer to change
-     * @param {string} filter the filter to set the layer to
+     * @param {string} filter the filter to set the layer to.  Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
      * @returns the updated list of layers
      * @example
      * ```js
