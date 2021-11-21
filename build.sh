@@ -12,5 +12,5 @@ uglifyjs --compress --mangle --comments --output ./dist/clipnship.min.js --sourc
 # Generate the API doc
 jsdoc2md src/clipnship.js > doc/api.md
 
-git add dist/clipnship.min.js dist/clipnship.min.js.map
+git add dist/clipnship.min.js dist/clipnship.min.js.map doc/api.md
 git commit -m $1
