@@ -60,7 +60,7 @@ Add a new layer to the clip converter
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | the name of the layer |
 | scale | <code>number</code> |  | the scale to set the layer to |
-| filter | <code>string</code> | <code>&quot;none&quot;</code> | (optional) the filter to apply to the layer, defaults to "none" |
+| filter | <code>string</code> | <code>&quot;none&quot;</code> | (optional) the filter to apply to the layer. Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter) |
 
 **Example**  
 ```jsconverter.addLayer("my-layer", 0.8, "blur(20px)");```
@@ -127,7 +127,7 @@ Updates a layer with a new filter value
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | the name of the layer to change |
-| filter | <code>string</code> | the filter to set the layer to |
+| filter | <code>string</code> | the filter to set the layer to.  Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter) |
 
 **Example**  
 ```jsconverter.updateLayerFilter("my-layer", "none");```
