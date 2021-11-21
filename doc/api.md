@@ -33,7 +33,7 @@ The ClipConverter constructor
 | video | <code>URL</code> | the video to convert |
 
 **Example**  
-```jsconst video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4"});const videoURL = URL.createObjectURL(video);const converter = new ClipConverter(videoURL);```
+```jsconst video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4" });const videoURL = URL.createObjectURL(video);const converter = new ClipConverter(videoURL);```
 <a name="ClipConverter+getPreview"></a>
 
 ### converter.getPreview(width) ⇒
