@@ -245,6 +245,7 @@ class ClipConverter {
      * ```
      */
     previewReset() {
+        this.previewPause();
         this._video.currentTime = 0;
     }
 
@@ -318,9 +319,9 @@ class ClipConverter {
             onFinishCallback(new Blob(outputChunks, { type: "video/webm;codecs=vp9" }));
         };
 
-        recorder.start(500);
+        this.previewReset();
         this._video.volume = 0.001; // mute for render
-        this._video.currentTime = 0; // make sure the video is at its start
+        recorder.start(500);
         this._video.play();
         this._video.onended = () => {
             clearInterval(this._playInterval);
