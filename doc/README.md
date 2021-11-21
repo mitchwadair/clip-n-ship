@@ -18,4 +18,4 @@ const converter = new ClipConverter(videoURL);
 
 ## API
 
-More information on the ClipNShip API can be found [here](doc/api.md).
+More information on the ClipNShip API can be found [here](api.md).
