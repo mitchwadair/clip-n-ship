@@ -28,7 +28,7 @@ For more info on how to use ClipNShip, check out the [docs](/doc) in this repo.
 
 ## Contribute
 
-COMING SOON
+Want to contribute to ClipNShip?  Check out the [contribution guidelines](/CONTRIBUTING.md) to see how.
 
 # Support
 
