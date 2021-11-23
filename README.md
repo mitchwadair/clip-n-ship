@@ -32,10 +32,10 @@ Want to contribute to ClipNShip?  Check out the [contribution guidelines](/CONTR
 
 # Support
 
-If you would like to help support maintaining ClipNShip, consider sponsoring me on [GitHub Sponsors](https://github.com/sponsors/mitchwadair). You can also give a one-time donation through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=9WS3KJPAV8JDJ&currency_code=USD).
+If you would like to help support maintaining ClipNShip, consider sponsoring me on [GitHub Sponsors](https://github.com/sponsors/mitchwadair). You can also give a one-time donation through [PayPal](https://paypal.me/mitchwadair).
 
 <p align="center">
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=9WS3KJPAV8JDJ&currency_code=USD">
+    <a href="https://paypal.me/mitchwadair">
         <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" height="75px" alt="PayPal Logo">
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
