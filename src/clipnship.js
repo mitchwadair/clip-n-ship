@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Mitchell Adair
+ * Copyright (c) 2021-2022 Mitchell Adair
  *
  * This software is released under the MIT License.
  * https://opensource.org/licenses/MIT
