@@ -2,7 +2,7 @@
 
 ## ClipConverter
 **Kind**: global class  
-**License**: Copyright (c) 2021 Mitchell AdairThis software is released under the MIT License.https://opensource.org/licenses/MIT  
+**License**: Copyright (c) 2021-2022 Mitchell AdairThis software is released under the MIT License.https://opensource.org/licenses/MIT  
 
 * [ClipConverter](#ClipConverter)
     * [new ClipConverter(video, outputWidth, outputHeight)](#new_ClipConverter_new)
