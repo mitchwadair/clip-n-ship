@@ -5,7 +5,7 @@
 **License**: Copyright (c) 2021 Mitchell AdairThis software is released under the MIT License.https://opensource.org/licenses/MIT  
 
 * [ClipConverter](#ClipConverter)
-    * [new ClipConverter(video)](#new_ClipConverter_new)
+    * [new ClipConverter(video, outputWidth, outputHeight)](#new_ClipConverter_new)
     * _instance_
         * [.getPreview(width)](#ClipConverter+getPreview) ⇒
         * [.addLayer(name, scale, filter)](#ClipConverter+addLayer) ⇒
@@ -24,13 +24,15 @@
 
 <a name="new_ClipConverter_new"></a>
 
-### new ClipConverter(video)
+### new ClipConverter(video, outputWidth, outputHeight)
 The ClipConverter constructor
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| video | <code>URL</code> | the video to convert |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| video | <code>URL</code> |  | the video to convert |
+| outputWidth | <code>number</code> | <code>1080</code> | the width of your output video |
+| outputHeight | <code>number</code> | <code>1920</code> | the height of your output video |
 
 **Example**  
 ```jsconst video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4" });const videoURL = URL.createObjectURL(video);const converter = new ClipConverter(videoURL);```
