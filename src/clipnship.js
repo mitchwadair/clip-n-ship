@@ -12,6 +12,8 @@ class ClipConverter {
      *
      * @typicalname converter
      * @param {URL} video the video to convert
+     * @param {number} outputWidth the width of your output video
+     * @param {number} outputHeight the height of your output video
      * @example
      * ```js
      * const video = new Blob(["file:///path/to/your/video/file.mp4"], { type: "video/mp4" });
@@ -20,22 +22,24 @@ class ClipConverter {
      * const converter = new ClipConverter(videoURL);
      * ```
      */
-    constructor(video) {
+    constructor(video, outputWidth = 1080, outputHeight = 1920) {
         if (!video) {
             throw new Error("Must include video data when instantiating a ClipConverter");
         }
 
         this._layers = [];
+        this._dimensions = { width: outputWidth, height: outputHeight };
         this._canvas = this._createCanvas();
         this._video = this._createVideo(video);
         this._playInterval;
     }
 
     _createCanvas() {
+        const { width, height } = this._dimensions;
         const canvas = document.createElement("canvas");
         canvas.setAttribute("id", "clipnship-canvas");
-        canvas.setAttribute("width", "1080");
-        canvas.setAttribute("height", "1920");
+        canvas.setAttribute("width", width);
+        canvas.setAttribute("height", height);
         return canvas;
     }
 
@@ -56,14 +60,21 @@ class ClipConverter {
         return videoElement;
     }
 
-    _calculateRenderValues(video, scale = 1) {
-        const vWidth = video.videoWidth;
-        const vHeight = video.videoHeight;
-        const oX = (vHeight - vWidth * scale) / 2;
-        const oY = (vWidth - vHeight * scale) / 2;
+    _calculateRenderValues(scale = 1) {
+        const { width, height } = this._dimensions;
+        let vWidth, vHeight, diffX, diffY;
+        if (width > height) {
+            vWidth = diffX = width;
+            vHeight = diffY = height;
+        } else {
+            vWidth = diffX = height;
+            vHeight = diffY = width;
+        }
+        const offsetX = (width - diffX * scale) / 2;
+        const offsetY = (height - diffY * scale) / 2;
         return {
-            offsetX: oX,
-            offsetY: oY,
+            offsetX,
+            offsetY,
             width: vWidth * scale,
             height: vHeight * scale,
         };
@@ -73,10 +84,10 @@ class ClipConverter {
         const ctx = this._canvas.getContext("2d");
         // doing a regular for loop for performance
         for (let i = 0; i < this._layers.length; i++) {
-            const layer = this._layers[i];
-            const { offsetX, offsetY, width, height } = this._calculateRenderValues(layer.source, layer.scale);
-            ctx.filter = layer.filter;
-            ctx.drawImage(layer.source, offsetX, offsetY, width, height);
+            const { source, scale, filter } = this._layers[i];
+            const { offsetX, offsetY, width, height } = this._calculateRenderValues(scale);
+            ctx.filter = filter;
+            ctx.drawImage(source, offsetX, offsetY, width, height);
         }
     }
 
