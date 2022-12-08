@@ -12,6 +12,7 @@ esbuild
         entryNames: "clipnship.min",
         globalName: "ClipConverter",
         outdir: "dist",
+        footer: { js: "ClipConverter = ClipConverter.default" },
     })
     .catch(() => process.exit(1));
 
