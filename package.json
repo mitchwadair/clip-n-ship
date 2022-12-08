@@ -4,9 +4,10 @@
     "description": "Convert video clips to TikTok format easily",
     "main": "src/clipnship.js",
     "type": "module",
-    "directories": {
-        "doc": "doc"
-    },
+    "files": [
+        "/src",
+        "LICENSE"
+    ],
     "scripts": {
         "build": "node ./scripts/build.js"
     },
