@@ -1,0 +1,36 @@
+{
+    "name": "clip-n-ship",
+    "version": "1.1.1",
+    "description": "Convert video clips to TikTok format easily",
+    "main": "src/clipnship.js",
+    "type": "module",
+    "directories": {
+        "doc": "doc"
+    },
+    "scripts": {
+        "build": "node ./scripts/build.js && git add . && git commit -m"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mitchwadair/clip-n-ship.git"
+    },
+    "keywords": [
+        "clip",
+        "ship",
+        "TikTok",
+        "video",
+        "convert",
+        "converter",
+        "browser"
+    ],
+    "author": "Mitchell Adair (https://github.com/mitchwadair)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mitchwadair/clip-n-ship/issues"
+    },
+    "homepage": "https://github.com/mitchwadair/clip-n-ship#readme",
+    "devDependencies": {
+        "esbuild": "0.16.1",
+        "jsdoc-to-markdown": "8.0.0"
+    }
+}
