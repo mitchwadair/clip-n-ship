@@ -1,13 +1,7 @@
 import esbuild from "esbuild";
 import jsdoc2md from "jsdoc-to-markdown";
-import { writeFileSync } from "fs";
-import { execSync } from "node:child_process";
-
-const args = process.argv.splice(2);
-if (args.length !== 1) {
-    console.error("Usage: ./build.sh v0.0.0");
-    process.exit(1);
-}
+import crypto from "crypto";
+import { writeFileSync, readFileSync } from "fs";
 
 esbuild
     .build({
@@ -25,5 +19,6 @@ jsdoc2md.render({ files: "src/clipnship.js" }).then((doc) => {
     writeFileSync("doc/api.md", doc);
 });
 
-execSync("git add .");
-execSync(`git commit -m "${args[0]}"`);
+const data = readFileSync("dist/clipnship.min.js");
+const checksum = crypto.createHash("sha512").update(data, "utf8").digest("hex");
+writeFileSync("checksum", checksum);
