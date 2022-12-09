@@ -340,4 +340,4 @@ class ClipConverter {
     }
 }
 
-window.ClipConverter = ClipConverter;
+export default ClipConverter;
