@@ -80,13 +80,20 @@ class ClipConverter {
         };
     }
 
+    _getFilterString(filter) {
+        if (Array.isArray(filter)) {
+            return filter.join(" ");
+        }
+        return filter;
+    }
+
     _drawLayers() {
         const ctx = this._canvas.getContext("2d");
         // doing a regular for loop for performance
         for (let i = 0; i < this._layers.length; i++) {
             const { source, scale, filter } = this._layers[i];
             const { offsetX, offsetY, width, height } = this._calculateRenderValues(scale);
-            ctx.filter = filter;
+            ctx.filter = this._getFilterString(filter);
             ctx.drawImage(source, offsetX, offsetY, width, height);
         }
     }
