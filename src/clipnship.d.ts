@@ -49,10 +49,10 @@ type FinishCallback = (data: Blob) => void;
 type ProgressCallback = (percent: number) => void;
 
 declare class ClipConverter {
-    constructor(video: URL, outputWidth = 1080, outputHeight = 1920);
+    constructor(video: URL, outputWidth?: number, outputHeight?: number);
 
-    getPreview(width: CSSLengthString | CSSPercentageString = "500px"): HTMLCanvasElement;
-    addLayer(name: string, scale: number, filter?: Filter = "none"): Array<Layer>;
+    getPreview(width?: CSSLengthString | CSSPercentageString): HTMLCanvasElement;
+    addLayer(name: string, scale: number, filter?: Filter): Array<Layer>;
     getLayer(name: string): Layer;
     removeLayer(name: string): Array<Layer>;
     getLayers(): Array<Layer>;
