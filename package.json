@@ -1,8 +1,9 @@
 {
     "name": "clip-n-ship",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Convert video clips to different size formats easily",
     "main": "src/clipnship.js",
+    "types": "src/clipnship.d.ts",
     "type": "module",
     "files": [
         "/src",

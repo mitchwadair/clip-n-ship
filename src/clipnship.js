@@ -80,13 +80,20 @@ class ClipConverter {
         };
     }
 
+    _getFilterString(filter) {
+        if (Array.isArray(filter)) {
+            return filter.join(" ");
+        }
+        return filter;
+    }
+
     _drawLayers() {
         const ctx = this._canvas.getContext("2d");
         // doing a regular for loop for performance
         for (let i = 0; i < this._layers.length; i++) {
             const { source, scale, filter } = this._layers[i];
             const { offsetX, offsetY, width, height } = this._calculateRenderValues(scale);
-            ctx.filter = filter;
+            ctx.filter = this._getFilterString(filter);
             ctx.drawImage(source, offsetX, offsetY, width, height);
         }
     }
@@ -113,7 +120,7 @@ class ClipConverter {
      *
      * @param {string} name the name of the layer
      * @param {number} scale the scale to set the layer to
-     * @param {string} filter (optional) the filter to apply to the layer. Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
+     * @param {string | string[]} filter (optional) the filter(s) to apply to the layer. Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
      * @returns the updated list of layers
      * @example
      * ```js
@@ -207,7 +214,7 @@ class ClipConverter {
      * Updates a layer with a new filter value
      *
      * @param {string} name the name of the layer to change
-     * @param {string} filter the filter to set the layer to.  Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
+     * @param {string | string[]} filter the filter(s) to set the layer to.  Valid values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)
      * @returns the updated list of layers
      * @example
      * ```js
